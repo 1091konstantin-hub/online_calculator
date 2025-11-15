@@ -1,49 +1,28 @@
-import math
-from flask import Flask, request, render_template_string
-
-app = Flask(__name__)
-
-HTML = """
-<form method="post">
-  <input type="number" name="a" placeholder="Первое число">
-  <input type="number" name="b" placeholder="Второе число">
-  <select name="op">
-    <option value="add">+</option>
-    <option value="sub">-</option>
-    <option value="mul">*</option>
-    <option value="div">/</option>
-    <option value="exp">^</option>
-    <option value="per">%</option>
-    <option value="sqrt">√</option>
-    <option value="sin">Sin</option>
-    <option value="cos">Cos</option>
-    <option value="log">Log</option>
-  </select>
-  <button type="submit">Посчитать</button>
-</form>
-<p>Результат: {{ result }}</p>
-"""
-
-
 @app.route("/", methods=["GET", "POST"])
 def calc():
     result = ""
     if request.method == "POST":
-        a = float(request.form["a"])
-        b = float(request.form["b"])
+        a_str = request.form["a"]
+        b_str = request.form["b"]
+
+        # преобразуем только если введено
+        a = float(a_str) if a_str else 0
+        b = float(b_str) if b_str else None
+
         op = request.form["op"]
+
         if op == "add":
-            result = a + b
+            result = a + (b if b is not None else 0)
         elif op == "sub":
-            result = a - b
+            result = a - (b if b is not None else 0)
         elif op == "mul":
-            result = a * b
+            result = a * (b if b is not None else 0)
         elif op == "div":
-            result = a / b if b != 0 else "Ошибка: деление на 0"
+            result = a / b if b not in (None, 0) else "Ошибка: деление на 0"
         elif op == "exp":
-            result = a**b
+            result = a**b if b is not None else "Ошибка: нужно два числа"
         elif op == "per":
-            result = a * b / 100
+            result = a * b / 100 if b is not None else "Ошибка: нужно два числа"
         elif op == "sqrt":
             result = math.sqrt(a) if a >= 0 else "Ошибка: отрицательное число"
         elif op == "sin":
@@ -51,10 +30,13 @@ def calc():
         elif op == "cos":
             result = math.cos(math.radians(a))
         elif op == "log":
-            result = math.log(a) if a > 0 else "Ошибка: число должно быть больше 0"
+            if b is None:
+                result = math.log(a) if a > 0 else "Ошибка: число должно быть > 0"
+            else:
+                result = (
+                    math.log(a, b)
+                    if a > 0 and b > 0 and b != 1
+                    else "Ошибка: неверное основание"
+                )
 
     return render_template_string(HTML, result=result)
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
