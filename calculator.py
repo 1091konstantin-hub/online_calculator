@@ -15,6 +15,9 @@ HTML = """
     <option value="exp">^</option>
     <option value="per">%</option>
     <option value="sqrt">√</option>
+    <option value="sin">Sin</option>
+    <option value="cos">Cos</option>
+    <option value="log">Log</option>
   </select>
   <button type="submit">Посчитать</button>
 </form>
@@ -43,6 +46,12 @@ def calc():
             result = a * b / 100
         elif op == "sqrt":
             result = math.sqrt(a) if a >= 0 else "Ошибка: отрицательное число"
+        elif op == "sin":
+            result = math.sin(math.radians(a))
+        elif op == "cos":
+            result = math.cos(math.radians(a))
+        elif op == "log":
+            result = math.log(a) if a > 0 else "Ошибка: число должно быть больше 0"
 
     return render_template_string(HTML, result=result)
 
