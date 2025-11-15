@@ -1,3 +1,33 @@
+import math
+from flask import Flask, request, render_template_string
+
+# сначала создаём приложение
+app = Flask(__name__)
+
+# потом пишем HTML
+HTML = """
+<form method="post">
+  <input type="number" name="a" placeholder="Первое число">
+  <input type="number" name="b" placeholder="Второе число">
+  <select name="op">
+    <option value="add">+</option>
+    <option value="sub">-</option>
+    <option value="mul">*</option>
+    <option value="div">/</option>
+    <option value="exp">^</option>
+    <option value="per">%</option>
+    <option value="sqrt">√</option>
+    <option value="sin">Sin</option>
+    <option value="cos">Cos</option>
+    <option value="log">Log</option>
+  </select>
+  <button type="submit">Посчитать</button>
+</form>
+<p>Результат: {{ result }}</p>
+"""
+
+
+# только после этого пишем маршруты
 @app.route("/", methods=["GET", "POST"])
 def calc():
     result = ""
@@ -5,7 +35,6 @@ def calc():
         a_str = request.form["a"]
         b_str = request.form["b"]
 
-        # преобразуем только если введено
         a = float(a_str) if a_str else 0
         b = float(b_str) if b_str else None
 
@@ -40,3 +69,8 @@ def calc():
                 )
 
     return render_template_string(HTML, result=result)
+
+
+# запуск приложения
+if __name__ == "__main__":
+    app.run(debug=True)
